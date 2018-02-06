@@ -1,5 +1,6 @@
 
 #bibliotecas
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import cross_val_score
@@ -18,10 +19,51 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import make_scorer, accuracy_score
 from sklearn.svm import SVC
 
-#Readimagesfromdatabase
+# try to import the PIL Image module
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+import logging
 
-path = "data/"
-classe1 = glob(path+'BlackGrass/*.png')
+
+#redimenciona as imagens
+def read_images(path, size):
+    c = 0
+    X,y = [], []
+    for dirname, dirnames, filenames in os.walk(path):
+        for subdirname in dirnames:
+            subject_path = os.path.join(dirname, subdirname)            
+            print("--- redimencionando para {} as imagens da pasta: {} ---".format(size, subdirname))
+            
+            for filename in os.listdir(subject_path):
+                try:
+                    if filename.endswith('.png'):                                                                   
+                        im = Image.open(os.path.join(subject_path, filename))                        
+                        im.thumbnail(size)                                                
+                        #im.convert(mode="L").save("{}segmentacao/{}/{}".format(path, subdirname, filename))     #converte em tons de cinza e depois salva
+                        im.save("data/segmentacao/{}/{}".format(subdirname, filename))
+                        #resize to given size (if given)                
+                    X.append(np.asarray(im, dtype=np.uint8))
+                    y.append(c)
+                except IOError as e:
+                    print("I/O error: {0}".format(e))            
+                except:
+                    print("Unexpected error: {0}".format(sys.exc_info()[0]))
+                    raise
+            c = c+1
+    return [X,y]
+
+path = "data/originais/"
+size = (100, 100)
+start = time.time()
+read_images(path, size)
+end = time.time()
+print("Tempo para o redimencionamento das imagens:",end - start)
+
+#ler as imagens para a base de dados
+path = "data/segmentacao/"
+classe1 = glob(path+'Black-grass/*.png')
 classe2 = glob(path+'Charlock/*.png')
 
 images_cc = imread_collection(classe1)
@@ -57,17 +99,17 @@ start = time.time()
 for id_im, imagem in enumerate(images_cc):
 	im_name = images_cc.files[id_im].split('/')[-1]
 	imagem_segmentada = segmentation(imagem)
-	imsave(path+'segmentacao/' + im_name, imagem_segmentada)
+	imsave(path + im_name, imagem_segmentada)
 	
 	#print(im_name)
 for id_im, imagem in enumerate(images_sc):
 	im_name = images_sc.files[id_im].split('/')[-1]
 	imagem_segmentada = segmentation(imagem)
-	imsave(path+'segmentacao/' + im_name, imagem_segmentada)
+	imsave(path + im_name, imagem_segmentada)
 	#print(im_name)
 
 end = time.time()
-print("\nTempo para a segmentacao das imagens:",end - start)
+print("Tempo para a segmentacao das imagens:",end - start)
 
 labels = np.concatenate((np.zeros(len(classe1)),np.ones(len(classe2))))
 
