@@ -1,22 +1,4 @@
 import os
-import sys
-
-
-# Import Matplotlib:
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.cm as cm
-
-# import facerec modules
-from facerec.feature import Fisherfaces
-from facerec.distance import EuclideanDistance
-from facerec.classifier import NearestNeighbor
-from facerec.model import PredictableModel
-from facerec.validation import KFoldCrossValidation
-from facerec.visual import subplot
-from facerec.util import minmax_normalize
-from facerec.serialization import save_model, load_model
-# import numpy, matplotlib and logging
 import numpy as np
 # try to import the PIL Image module
 try:
@@ -32,14 +14,16 @@ def read_images(path, sz=None):
     tam = (100, 100)
     for dirname, dirnames, filenames in os.walk(path):
         for subdirname in dirnames:
-            subject_path = os.path.join(dirname, subdirname)
+            subject_path = os.path.join(dirname, subdirname)            
+            print("--- escalando para 100x100 as imagens da pasta: {} ---".format(subdirname))
+            
             for filename in os.listdir(subject_path):
                 try:
-                    if filename.endswith('.png'):   
-                        print("imagens da pasta:{} ---".format(c))                                         
+                    if filename.endswith('.png'):                                                                   
                         im = Image.open(os.path.join(subject_path, filename))                        
-                        im.thumbnail(tam)                        
-                        im.convert(mode="L").save("{}/{}".format(subject_path, filename))
+                        im.thumbnail(tam)                                                
+                        #im.convert(mode="L").save("{}segmentacao/{}/{}".format(path, subdirname, filename))     #converte em tons de cinza e depois salva
+                        im.save("{}segmentacao/{}/{}".format(path, subdirname, filename))
                         #resize to given size (if given)                
                     X.append(np.asarray(im, dtype=np.uint8))
                     y.append(c)
