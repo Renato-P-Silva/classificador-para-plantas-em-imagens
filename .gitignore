@@ -1,3 +1,4 @@
 # imagens
 *.png
-
+.vs/
+data/

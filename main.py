@@ -34,7 +34,7 @@ def read_images(path, size):
     for dirname, dirnames, filenames in os.walk(path):
         for subdirname in dirnames:
             subject_path = os.path.join(dirname, subdirname)            
-            print("--- redimencionando para {} as imagens da pasta: {} ---".format(size, subdirname))
+            print("--- redimensionando para {} as imagens da pasta: {} ---".format(size, subdirname))
             
             for filename in os.listdir(subject_path):
                 try:
@@ -59,15 +59,35 @@ size = (100, 100)
 start = time.time()
 read_images(path, size)
 end = time.time()
-print("Tempo para o redimencionamento das imagens:",end - start)
+print("Tempo para o redimensionamento das imagens:",end - start)
 
 #ler as imagens para a base de dados
 path = "data/segmentacao/"
-classe1 = glob(path+'Black-grass/*.png')
-classe2 = glob(path+'Charlock/*.png')
+classe1 = glob(path + 'BlackGrass/*.png')
+classe2 = glob(path + 'Charlock/*.png')
+classe3 = glob(path + 'Cleavers/*.png')
+classe4 = glob(path + 'Common\ Chickweed/*.png')
+classe5 = glob(path + 'Common\ wheat/*.png')
+classe6 = glob(path + 'Fat\ Hen/*.png')
+classe7 = glob(path + 'Loose\ Silky-bent/*.png')
+classe8 = glob(path + 'Maize/*.png')
+classe9 = glob(path + 'Scentless\ Mayweed/*.png')
+classe10 = glob(path + 'Shepherds\ Purse/*.png')
+classe11 = glob(path + 'Small-flowered\ Cranesbill/*.png')
+classe12 = glob(path + 'Sugar beet/*.png')
 
 images_cc = imread_collection(classe1)
 images_sc = imread_collection(classe2)
+images_sc = imread_collection(classe3)
+images_sc = imread_collection(classe4)
+images_sc = imread_collection(classe5)
+images_sc = imread_collection(classe6)
+images_sc = imread_collection(classe7)
+images_sc = imread_collection(classe8)
+images_sc = imread_collection(classe9)
+images_sc = imread_collection(classe10)
+images_sc = imread_collection(classe11)
+images_sc = imread_collection(classe12)
 
 def segmentation(im):
 #Recebe uma imagem calcula limiar de otsu e fazer o recorte obdecendo a regiao resultante desse limiar
@@ -111,13 +131,26 @@ for id_im, imagem in enumerate(images_sc):
 end = time.time()
 print("Tempo para a segmentacao das imagens:",end - start)
 
-labels = np.concatenate((np.zeros(len(classe1)),np.ones(len(classe2))))
+labels = np.concatenate((np.zeros(len(classe1)),np.ones(len(classe2)),np.zeros(len(classe3)),np.ones(len(classe4))\
+,np.zeros(len(classe5)),np.ones(len(classe6)),np.zeros(len(classe7)),np.ones(len(classe8)),np.zeros(len(classe9))\
+,np.ones(len(classe10)),np.zeros(len(classe11)),np.ones(len(classe12))))
 
 # Extracting Features using GLCM
 path_segmentada = "data/segmentacao/"
 classe1 = glob(path_segmentada + 'BlackGrass/*.png')
 classe2 = glob(path_segmentada + 'Charlock/*.png')
-images = imread_collection(classe1 + classe2)
+classe3 = glob(path_segmentada + 'Cleavers/*.png')
+classe4 = glob(path_segmentada + 'Common\ Chickweed/*.png')
+classe5 = glob(path_segmentada + 'Common\ wheat/*.png')
+classe6 = glob(path_segmentada + 'Fat\ Hen/*.png')
+classe7 = glob(path_segmentada + 'Loose\ Silky-bent/*.png')
+classe8 = glob(path_segmentada + 'Maize/*.png')
+classe9 = glob(path_segmentada + 'Scentless\ Mayweed/*.png')
+classe10 = glob(path_segmentada + 'Shepherds\ Purse/*.png')
+classe11 = glob(path_segmentada + 'Small-flowered\ Cranesbill/*.png')
+classe12 = glob(path_segmentada + 'Sugar beet/*.png')
+images = imread_collection(classe1 + classe2 + classe3 + classe4 + classe5 + classe6 + classe7\
++ classe8 + classe9 + classe10 + classe11 + classe12)
 
 d = 15
 
