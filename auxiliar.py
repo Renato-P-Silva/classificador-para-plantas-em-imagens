@@ -23,7 +23,7 @@ def read_images(path, sz=None):
                         im = Image.open(os.path.join(subject_path, filename))                        
                         im.thumbnail(tam)                                                
                         #im.convert(mode="L").save("{}segmentacao/{}/{}".format(path, subdirname, filename))     #converte em tons de cinza e depois salva
-                        im.save("{}segmentacao/{}/{}".format(path, subdirname, filename))
+                        im.save("data/segmentacao/{}/{}".format(subdirname, filename))
                         #resize to given size (if given)                
                     X.append(np.asarray(im, dtype=np.uint8))
                     y.append(c)
@@ -36,7 +36,7 @@ def read_images(path, sz=None):
     return [X,y]
     
 #caminho dos dados
-data1 = "data/"
+data1 = "data/originais/"
 
 if __name__ == "__main__":
     # Lendo os dados da imagem. Este deve ser um caminho válido!
