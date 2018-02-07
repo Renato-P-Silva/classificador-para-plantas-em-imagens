@@ -130,25 +130,6 @@ np.ones(len(Classes[5])), np.zeros(len(Classes[6])), np.ones(len(Classes[7])),\
 np.zeros(len(Classes[8])), np.ones(len(Classes[9])), np.zeros(len(Classes[10])),\
 np.ones(len(Classes[11]))))
 
-# Extracting Features using GLCM
-path = "data/segmentacao/"
-Classes = list(range(12))
-
-# O trecho abaixo é desnecessário #############################################
-Classes[0] = glob(path + 'BlackGrass/*.png')
-Classes[1] = glob(path + 'Charlock/*.png')
-Classes[2] = glob(path + 'Cleavers/*.png')
-Classes[3] = glob(path + 'Common\ Chickweed/*.png')
-Classes[4] = glob(path + 'Common\ wheat/*.png')
-Classes[5] = glob(path + 'Fat\ Hen/*.png')
-Classes[6] = glob(path + 'Loose\ Silky-bent/*.png')
-Classes[7] = glob(path + 'Maize/*.png')
-Classes[8] = glob(path + 'Scentless\ Mayweed/*.png')
-Classes[9] = glob(path + 'Shepherds\ Purse/*.png')
-Classes[10] = glob(path + 'Small-flowered\ Cranesbill/*.png')
-Classes[11] = glob(path + 'Sugar beet/*.png')
-###############################################################################
-
 images = imread_collection(Classes[0] + Classes[1] + Classes[2] + Classes[3]\
 + Classes[4] + Classes[5] + Classes[6] + Classes[7] + Classes[8] + Classes[9]\
 + Classes[10] + Classes[11])
