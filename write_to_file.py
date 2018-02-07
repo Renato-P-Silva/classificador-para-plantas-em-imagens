@@ -7,7 +7,7 @@ def WriteResults(ResultMatrix):
 		with open("output.xml", "w") as F:
 			F.write("<output>\n")
 			for Result in ResultMatrix:
-				f.Write("<image src=" + Result[0] + " class=" + Result[1] + "/>")
+				f.Write("<image src=\"" + Result[0] + "\" class=\"" + Result[1] + "\"/>")
 			F.write("</output>")
 	except:
 		print("Fail")
