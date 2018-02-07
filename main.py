@@ -63,33 +63,28 @@ read_images(path, size)
 end = time.time()
 print("Tempo para o redimensionamento das imagens:",end - start)
 
-#ler as imagens para a base de dados
+#ler as imagens para a base de dados ##########################################
 path = "data/segmentacao/"
-classe1 = glob(path + 'BlackGrass/*.png')
-classe2 = glob(path + 'Charlock/*.png')
-classe3 = glob(path + 'Cleavers/*.png')
-classe4 = glob(path + 'Common\ Chickweed/*.png')
-classe5 = glob(path + 'Common\ wheat/*.png')
-classe6 = glob(path + 'Fat\ Hen/*.png')
-classe7 = glob(path + 'Loose\ Silky-bent/*.png')
-classe8 = glob(path + 'Maize/*.png')
-classe9 = glob(path + 'Scentless\ Mayweed/*.png')
-classe10 = glob(path + 'Shepherds\ Purse/*.png')
-classe11 = glob(path + 'Small-flowered\ Cranesbill/*.png')
-classe12 = glob(path + 'Sugar beet/*.png')
+Classes = list(range(12))
 
-images_cc = imread_collection(classe1)
-images_sc = imread_collection(classe2)
-images_sc = imread_collection(classe3)
-images_sc = imread_collection(classe4)
-images_sc = imread_collection(classe5)
-images_sc = imread_collection(classe6)
-images_sc = imread_collection(classe7)
-images_sc = imread_collection(classe8)
-images_sc = imread_collection(classe9)
-images_sc = imread_collection(classe10)
-images_sc = imread_collection(classe11)
-images_sc = imread_collection(classe12)
+Classes[0] = glob(path + 'BlackGrass/*.png')
+Classes[1] = glob(path + 'Charlock/*.png')
+Classes[2] = glob(path + 'Cleavers/*.png')
+Classes[3] = glob(path + 'Common\ Chickweed/*.png')
+Classes[4] = glob(path + 'Common\ wheat/*.png')
+Classes[5] = glob(path + 'Fat\ Hen/*.png')
+Classes[6] = glob(path + 'Loose\ Silky-bent/*.png')
+Classes[7] = glob(path + 'Maize/*.png')
+Classes[8] = glob(path + 'Scentless\ Mayweed/*.png')
+Classes[9] = glob(path + 'Shepherds\ Purse/*.png')
+Classes[10] = glob(path + 'Small-flowered\ Cranesbill/*.png')
+Classes[11] = glob(path + 'Sugar beet/*.png')
+
+ImagesPerClass = []
+for Class in range(12):
+	ImagesPerClass.append(imread_collection(Classes[Class]))
+
+###############################################################################
 
 def segmentation(im):
 #Recebe uma imagem calcula limiar de otsu e fazer o recorte obdecendo a regiao resultante desse limiar
@@ -118,41 +113,45 @@ def segmentation(im):
 	return imagem_cortada
 
 start = time.time()
-for id_im, imagem in enumerate(images_cc):
-	im_name = images_cc.files[id_im].split('/')[-1]
-	imagem_segmentada = segmentation(imagem)
-	imsave(path + im_name, imagem_segmentada)
-	
-	#print(im_name)
-for id_im, imagem in enumerate(images_sc):
-	im_name = images_sc.files[id_im].split('/')[-1]
-	imagem_segmentada = segmentation(imagem)
-	imsave(path + im_name, imagem_segmentada)
-	#print(im_name)
+for Class in ImagesPerClass:
+	for id_im, imagem in enumerate(Class):
+		im_name = Class.files[id_im].split('/')[-1]
+		imagem_segmentada = segmentation(imagem)
+		imsave(path + im_name, imagem_segmentada)
+
+
 
 end = time.time()
 print("Tempo para a segmentacao das imagens:",end - start)
 
-labels = np.concatenate((np.zeros(len(classe1)),np.ones(len(classe2)),np.zeros(len(classe3)),np.ones(len(classe4))\
-,np.zeros(len(classe5)),np.ones(len(classe6)),np.zeros(len(classe7)),np.ones(len(classe8)),np.zeros(len(classe9))\
-,np.ones(len(classe10)),np.zeros(len(classe11)),np.ones(len(classe12))))
+labels = np.concatenate((np.zeros(len(Classes[0])), np.ones(len(Classes[1])),\
+np.zeros(len(Classes[2])), np.ones(len(Classes[3])), np.zeros(len(Classes[4])),\
+np.ones(len(Classes[5])), np.zeros(len(Classes[6])), np.ones(len(Classes[7])),\
+np.zeros(len(Classes[8])), np.ones(len(Classes[9])), np.zeros(len(Classes[10])),\
+np.ones(len(Classes[11]))))
 
 # Extracting Features using GLCM
-path_segmentada = "data/segmentacao/"
-classe1 = glob(path_segmentada + 'BlackGrass/*.png')
-classe2 = glob(path_segmentada + 'Charlock/*.png')
-classe3 = glob(path_segmentada + 'Cleavers/*.png')
-classe4 = glob(path_segmentada + 'Common\ Chickweed/*.png')
-classe5 = glob(path_segmentada + 'Common\ wheat/*.png')
-classe6 = glob(path_segmentada + 'Fat\ Hen/*.png')
-classe7 = glob(path_segmentada + 'Loose\ Silky-bent/*.png')
-classe8 = glob(path_segmentada + 'Maize/*.png')
-classe9 = glob(path_segmentada + 'Scentless\ Mayweed/*.png')
-classe10 = glob(path_segmentada + 'Shepherds\ Purse/*.png')
-classe11 = glob(path_segmentada + 'Small-flowered\ Cranesbill/*.png')
-classe12 = glob(path_segmentada + 'Sugar beet/*.png')
-images = imread_collection(classe1 + classe2 + classe3 + classe4 + classe5 + classe6 + classe7\
-+ classe8 + classe9 + classe10 + classe11 + classe12)
+path = "data/segmentacao/"
+Classes = list(range(12))
+
+# O trecho abaixo é desnecessário #############################################
+Classes[0] = glob(path + 'BlackGrass/*.png')
+Classes[1] = glob(path + 'Charlock/*.png')
+Classes[2] = glob(path + 'Cleavers/*.png')
+Classes[3] = glob(path + 'Common\ Chickweed/*.png')
+Classes[4] = glob(path + 'Common\ wheat/*.png')
+Classes[5] = glob(path + 'Fat\ Hen/*.png')
+Classes[6] = glob(path + 'Loose\ Silky-bent/*.png')
+Classes[7] = glob(path + 'Maize/*.png')
+Classes[8] = glob(path + 'Scentless\ Mayweed/*.png')
+Classes[9] = glob(path + 'Shepherds\ Purse/*.png')
+Classes[10] = glob(path + 'Small-flowered\ Cranesbill/*.png')
+Classes[11] = glob(path + 'Sugar beet/*.png')
+###############################################################################
+
+images = imread_collection(Classes[0] + Classes[1] + Classes[2] + Classes[3]\
++ Classes[4] + Classes[5] + Classes[6] + Classes[7] + Classes[8] + Classes[9]\
++ Classes[10] + Classes[11])
 
 d = 15
 
