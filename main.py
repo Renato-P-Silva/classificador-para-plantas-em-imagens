@@ -28,9 +28,12 @@ except ImportError:
     import Image
 import logging
 
+#ARQUIVO PARA A SAÍDA #########################################################
+Output = []
+###############################################################################
 
 #redimenciona as imagens
-def read_images(path, size):
+def read_images(path, size, OutputPath):
     c = 0
     X,y = [], []
     for dirname, dirnames, filenames in os.walk(path):
@@ -44,7 +47,7 @@ def read_images(path, size):
                         im = Image.open(os.path.join(subject_path, filename))                        
                         im.thumbnail(size)                                                
                         #im.convert(mode="L").save("{}segmentacao/{}/{}".format(path, subdirname, filename))     #converte em tons de cinza e depois salva
-                        im.save("data/segmentacao/{}/{}".format(subdirname, filename))
+                        im.save((OutputPath + "/{}/{}").format(subdirname, filename))
                         #resize to given size (if given)                
                     X.append(np.asarray(im, dtype=np.uint8))
                     y.append(c)
@@ -59,7 +62,7 @@ def read_images(path, size):
 path = "data/originais/"
 size = (100, 100)
 start = time.time()
-read_images(path, size)
+read_images(path, size, "data/segmentacao/")
 end = time.time()
 print("Tempo para o redimensionamento das imagens:",end - start)
 
@@ -78,13 +81,14 @@ Classes[7] = glob(path + 'Maize/*.png')
 Classes[8] = glob(path + 'Scentless\ Mayweed/*.png')
 Classes[9] = glob(path + 'Shepherds\ Purse/*.png')
 Classes[10] = glob(path + 'Small-flowered\ Cranesbill/*.png')
-Classes[11] = glob(path + 'Sugar beet/*.png')
+Classes[11] = glob(path + 'Sugar\ beet/*.png')
 
 ImagesPerClass = []
 for Class in range(12):
 	ImagesPerClass.append(imread_collection(Classes[Class]))
 
 ###############################################################################
+
 
 def segmentation(im):
 #Recebe uma imagem calcula limiar de otsu e fazer o recorte obdecendo a regiao resultante desse limiar
@@ -124,6 +128,57 @@ for Class in ImagesPerClass:
 end = time.time()
 print("Tempo para a segmentacao das imagens:",end - start)
 
+#IMAGENS DE TESTE #############################################################
+size = (100, 100)
+start = time.time()
+read_images("data/teste/", size, "data/teste_segmentado/")
+end = time.time()
+print("Tempo para o redimensionamento das imagens: CONJUNTO TESTE",end - start)
+
+#Lê as imagens de teste #######################################################
+TestData = glob('data/teste_segmentado/teste/*.png')
+TestDataCollection = imread_collection(TestData)
+
+
+start = time.time()
+for id_im, imagem in enumerate(TestDataCollection):
+	im_name = TestDataCollection.files[id_im].split('/')[-1]
+	imagem_segmentada = segmentation(imagem)
+	imsave("data/teste_segmentado/" + im_name, imagem_segmentada)
+end = time.time()
+print("Tempo para a segmentacao das imagens: CONJUNTO TESTE",end - start)
+
+LabelsTest = np.zeros(len(TestData))
+
+Images_Test = imread_collection(TestData)
+d = 15
+Features_Test = np.zeros((len(LabelsTest), 18))
+###############################################################################
+
+
+start = time.time()
+for id_im, imagem in enumerate(Images_Test):
+	for id_ch in range(3):
+		matrix0 = greycomatrix( imagem[:,:,id_ch], [d], [0], normed = True )
+		matrix1 = greycomatrix( imagem[:,:,id_ch], [d], [np.pi/4], normed = True )
+		matrix2 = greycomatrix( imagem[:,:,id_ch], [d], [np.pi/2], normed = True )
+		matrix3 = greycomatrix( imagem[:,:,id_ch], [d], [3*np.pi/4], normed = True )
+		matrix = ( matrix0+matrix1+matrix2+matrix3)/4
+		props = np.zeros((6))
+		props[0] = greycoprops( matrix, 'contrast' )
+		props[1] = greycoprops( matrix, 'dissimilarity' )
+		props[2] = greycoprops( matrix, 'homogeneity' )
+		props[3] = greycoprops( matrix, 'energy' )
+		props[4] = greycoprops( matrix, 'correlation' )
+		props[5] = greycoprops( matrix, 'ASM' )
+		Features_Test[id_im, id_ch*6:(id_ch+1)*6] = props
+
+end=time.time()
+print('Tempo para extrair atributos usando GLCM:', end-start)
+
+
+
+
 labels = np.concatenate((np.zeros(len(Classes[0])), np.ones(len(Classes[1])),\
 np.zeros(len(Classes[2])), np.ones(len(Classes[3])), np.zeros(len(Classes[4])),\
 np.ones(len(Classes[5])), np.zeros(len(Classes[6])), np.ones(len(Classes[7])),\
@@ -157,6 +212,7 @@ for id_im, imagem in enumerate(images):
 end=time.time()
 print('Tempo para extrair atributos usando GLCM:', end-start)
 
+'''
 # Split Data
 train = 0.5
 test = 1-train
@@ -164,6 +220,27 @@ X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size 
 print('-------------------------------------------------------')
 print("\nConjunto de treino: {0}\nConjunto de teste: {1}\n".format(X_train.size,  y_train.size))
 print('-------------------------------------------------------')
+'''
+
+#GAMBIARRA#####################################################################
+# Split Data
+train = 1
+test = 0
+X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size = test)
+print('-------------------------------------------------------')
+print("\nConjunto de treino: {0}\nConjunto de teste: {1}\n".format(X_train.size,  X_test.size))
+print('-------------------------------------------------------')
+
+train = 0
+test = 1
+J, XTest, K, YTest = train_test_split(Features_Test, LabelsTest, test_size = test)
+print('-------------------------------------------------------')
+print("\nConjunto de treino: {0}\nConjunto de teste: {1}\n".format(J.size,  XTest.size))
+print('-------------------------------------------------------')
+
+
+#FIM DA GAMBIARRA##############################################################
+
 # Random Forest Parameter Estimation
 def rf_parameter_estimation(xEst, yEst):
 
@@ -214,23 +291,18 @@ start = time.time()
 parameters = rf_parameter_estimation(X_train, y_train)
 c_rf = RandomForestClassifier(**parameters)
 c_rf.fit(X_train, y_train)
-pred = c_rf.predict(X_test)
-acc_rf = accuracy_score(y_test, pred)
+pred = c_rf.predict(XTest)#resultado predito RFC
 end = time.time()
 print('\nTempo para classificacao usando Random Forest:', end - start)
-print('Random Forest Accuracy:', acc_rf)
-print('-------------------------------------------------------')
+
 start = time.time()
 parameters = svm_parameter_estimation(X_train, y_train)
 c_svm = SVC(**parameters)
 c_svm.fit(X_train, y_train)
-pred = c_svm.predict(X_test)
-acc_svm = accuracy_score(y_test, pred)
+pred = c_svm.predict(XTest)#resultado predito SVM
 
 end = time.time()
 print('\nTempo para classificacao usando SVM:', end - start)
-print('Support Vector Machine Accuracy:', acc_svm)
-print('-------------------------------------------------------')
 
 """
 #Classification using PCA
