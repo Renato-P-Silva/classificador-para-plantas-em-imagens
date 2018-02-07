@@ -19,6 +19,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import make_scorer, accuracy_score
 from sklearn.svm import SVC
 
+from write_to_file import WriteResults
+
 # try to import the PIL Image module
 try:
     from PIL import Image

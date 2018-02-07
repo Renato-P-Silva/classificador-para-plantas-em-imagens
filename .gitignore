@@ -2,3 +2,4 @@
 *.png
 .vs/
 data/
+__pycache__/write_to_file.cpython-36.pyc
