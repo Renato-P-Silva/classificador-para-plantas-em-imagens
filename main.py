@@ -152,7 +152,7 @@ LabelsTest = np.zeros(len(TestData))
 
 Images_Test = imread_collection(TestData)
 d = 15
-Features_Test = np.zeros((len(LabelsTest), 18))
+FeaturesTest = np.zeros((len(LabelsTest), 18))
 ###############################################################################
 
 
@@ -171,7 +171,7 @@ for id_im, imagem in enumerate(Images_Test):
 		props[3] = greycoprops( matrix, 'energy' )
 		props[4] = greycoprops( matrix, 'correlation' )
 		props[5] = greycoprops( matrix, 'ASM' )
-		Features_Test[id_im, id_ch*6:(id_ch+1)*6] = props
+		FeaturesTest[id_im, id_ch*6:(id_ch+1)*6] = props
 
 end=time.time()
 print('Tempo para extrair atributos usando GLCM:', end-start)
@@ -233,7 +233,7 @@ print('-------------------------------------------------------')
 
 train = 0
 test = 1
-J, XTest, K, YTest = train_test_split(Features_Test, LabelsTest, test_size = test)
+J, XTest, K, YTest = train_test_split(FeaturesTest, LabelsTest, test_size = test)
 print('-------------------------------------------------------')
 print("\nConjunto de treino: {0}\nConjunto de teste: {1}\n".format(J.size,  XTest.size))
 print('-------------------------------------------------------')
